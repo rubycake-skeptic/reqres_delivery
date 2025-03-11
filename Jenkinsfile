@@ -25,6 +25,8 @@ pipeline {
                     def changedFiles = sh(returnStdout: true, script: 'git diff --name-only HEAD~1 HEAD').trim().split('\n')
 
                     // 'src/' 폴더 변경 여부 확인
+                    echo | ls
+                    echo "${changedFiles}"
                     def targetFolder = 'src/*'
                     def isModified = changedFiles.any { it.startsWith(targetFolder) }
     
