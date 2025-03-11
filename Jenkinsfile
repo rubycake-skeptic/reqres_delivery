@@ -26,7 +26,6 @@ pipeline {
 
                     // 'src/' 폴더 변경 여부 확인
                     echo | ls
-                    echo "${changedFiles}"
                     def targetFolder = 'src/*'
                     def isModified = changedFiles.any { it.startsWith(targetFolder) }
     
