@@ -17,6 +17,28 @@ pipeline {
     }
  
     stages {
+
+        stage('Check Modified Files') {
+            steps {
+                script {
+                    // Git 변경된 파일 목록 가져오기
+                    def changedFiles = sh(returnStdout: true, script: 'git diff --name-only HEAD~1 HEAD').trim().split('\n')
+
+                    // 'src/' 폴더 변경 여부 확인
+                    def targetFolder = 'src/*'
+                    def isModified = changedFiles.any { it.startsWith(targetFolder) }
+    
+                    if (isModified) {
+                        echo "Changes detected in ${targetFolder}. Proceeding with the pipeline."
+                    } else {
+                        echo "No changes in ${targetFolder}. Stopping pipeline execution."
+                        currentBuild.result = 'NOT_BUILT'
+                        return
+                    }
+                }
+            }
+        }
+        
         stage('Clone Repository') {
             steps {
                 checkout scm
@@ -90,8 +112,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed 's|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|' azure/deploy.yaml
-                    sed -i 's|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|' azure/deploy.yaml
+                    sed -i 's|image: ${REGISTRY}/${IMAGE_NAME}:.*|image: ${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}|' azure/deploy.yaml
                     cat azure/deploy.yaml
                     """
                 }
