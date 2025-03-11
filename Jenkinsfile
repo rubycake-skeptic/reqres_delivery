@@ -12,7 +12,7 @@ pipeline {
         GIT_USERNAME = 'rubycake-skeptic'
         GIT_USER_EMAIL = 'ruby-cake-skeptic@duck.com'
         GITHUB_CREDENTIALS_ID = 'Github-Cred'
-        GITHUB_REPO = 'github.com/rubycake-skeptic/reqres_products.git'
+        GITHUB_REPO = 'github.com/rubycake-skeptic/reqres_delivery.git'
         GITHUB_BRANCH = 'master'
     }
  
@@ -111,7 +111,6 @@ pipeline {
                             git config --global user.email "${GIT_USER_EMAIL}"
                             git config --global user.name "Jenkins CI"
                             git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${GITHUB_REPO} repo
-                            echo | ls repo
                             cp azure/deploy.yaml repo/azure/deploy.yaml
                             cd repo
                             git add azure/deploy.yaml
