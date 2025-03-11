@@ -9,6 +9,11 @@ pipeline {
         AKS_NAMESPACE = 'default'
         AZURE_CREDENTIALS_ID = 'Azure-Cred'
         TENANT_ID = 'ecd8d459-73d3-48f6-bf87-629631dc2d71' // Service Principal 등록 후 생성된 ID
+        GIT_USERNAME = 'rubycake-skeptic'
+        GIT_USER_EMAIL = 'ruby-cake-skeptic@duck.com'
+        GITHUB_CREDENTIALS_ID = 'Github-Cred'
+        GITHUB_REPO = 'github.com/rubycake-skeptic/reqres_products.git'
+        GITHUB_BRANCH = 'master'
     }
  
     stages {
@@ -75,5 +80,47 @@ pipeline {
         //         }
         //     }
         // }
+
+        stage('Update deploy.yaml') {
+            when {
+                expression {
+                    currentBuild.result != 'NOT_BUILT'
+                }
+            }
+            steps {
+                script {
+                    sh """
+                    sed -i 's|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|' azure/deploy.yaml
+                    cat azure/deploy.yaml
+                    """
+                }
+            }
+        }
+        
+        stage('Commit and Push to GitHub') {
+            when {
+                expression {
+                    currentBuild.result != 'NOT_BUILT'
+                }
+            }
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: GITHUB_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh """
+                            git config --global user.email "${GIT_USER_EMAIL}"
+                            git config --global user.name "Jenkins CI"
+                            git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${GITHUB_REPO} repo
+                            cp azure/deploy.yaml repo/azure/deploy.yaml
+                            cd repo
+                            git add azure/deploy.yaml
+                            git commit -m "Update deploy.yaml with build ${env.BUILD_NUMBER}"
+                            git push origin ${GITHUB_BRANCH}
+                            cd ..
+                            rm -rf repo
+                        """
+                    }
+                }
+            }
+        } 
     }
 }
