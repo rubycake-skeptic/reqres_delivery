@@ -90,7 +90,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed -i \'s|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|\' azure/deploy.yaml
+                    sed 's|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|' azure/deploy.yaml
+                    sed -i 's|image: \"${REGISTRY}/${IMAGE_NAME}:.*\"|image: \"${REGISTRY}/${IMAGE_NAME}:v${env.BUILD_ID}\"|' azure/deploy.yaml
                     cat azure/deploy.yaml
                     """
                 }
