@@ -33,6 +33,7 @@ pipeline {
                         echo | ls
                     } else {
                         echo "No changes in ${targetFolder}. Stopping pipeline execution."
+                        echo | ls
                         currentBuild.result = 'NOT_BUILT'
                         return
                     }
