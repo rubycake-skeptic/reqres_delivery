@@ -30,7 +30,7 @@ public class Delivery {
     @PostPersist
     private void callProductApi() {
 
-        // 1. 상품 서비스에 수량을 직접 변경하여 JPA calls
+        // 1. 상품 서비스에 수량을 직접 변경하여 JPA call
         RestTemplate restTemplate = Application.applicationContext.getBean(RestTemplate.class);
         Environment env = Application.applicationContext.getEnvironment();
         String productUrl = env.getProperty("api.url.product") + "/products/" + productId;
