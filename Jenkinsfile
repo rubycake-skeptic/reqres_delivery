@@ -107,6 +107,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: GITHUB_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
+                            rm -rf repo
                             git config --global user.email "${GIT_USER_EMAIL}"
                             git config --global user.name "Jenkins CI"
                             git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${GITHUB_REPO} repo
